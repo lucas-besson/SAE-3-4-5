@@ -1,0 +1,10 @@
+# Binaries
+bin
+obj
+
+# Pycharm
+.idea
+*.userprefs 
+
+# VScode
+.vscode
