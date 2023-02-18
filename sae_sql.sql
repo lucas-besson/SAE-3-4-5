@@ -153,12 +153,4 @@ INSERT INTO ski (libelle_ski, prix_ski, stock, image, id_niveau, id_taille_ski, 
         ('SIGNATURE ROC 550 (XPRESS) ', 540, 3, 'SIGNATURE_ROC_550.png', 2, 6, 1),
         ('STRATO EDITION (Konect)', 1195, 5, 'SIGNATURE_STRATO.png', 3, 11, 1);
 
-SELECT * FROM ski
 
-SELECT libelle_ski AS nom  FROM ski
-SELECT id_ski AS id_article
-                   , libelle_ski AS nom
-                   , prix_ski AS prix
-                   , stock AS stock
-            FROM ski
-            ORDER BY libelle_ski;
