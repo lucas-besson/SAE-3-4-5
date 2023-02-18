@@ -153,12 +153,16 @@ INSERT INTO ski (libelle_ski, prix_ski, stock, image, id_niveau, id_taille_ski, 
         ('SIGNATURE ROC 550 (XPRESS) ', 540, 3, 'SIGNATURE_ROC_550.png', 2, 6, 1),
         ('STRATO EDITION (Konect)', 1195, 5, 'SIGNATURE_STRATO.png', 3, 11, 1);
 
-SELECT * FROM ski
+INSERT INTO etat (libelle) VALUES
+        ('en cours de traitement'),
+        ('expédié');
 
-SELECT libelle_ski AS nom  FROM ski
-SELECT id_ski AS id_article
-                   , libelle_ski AS nom
-                   , prix_ski AS prix
-                   , stock AS stock
-            FROM ski
-            ORDER BY libelle_ski;
+INSERT INTO commande (date_achat, id_etat, id_utilisateur) VALUES
+        ('2018-09-2',1,3),
+        ('2021-09-2',2,3);
+
+INSERT INTO ligne_commande (id_commande,id_ski,prix,quantite) VALUES
+        (1,1,750,2),
+        (1,3,750,2),
+        (2,2,1125,3);
+
