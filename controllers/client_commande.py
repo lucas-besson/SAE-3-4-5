@@ -77,7 +77,7 @@ def client_commande_show():
     id_commande = request.args.get('id_commande', None)
     if id_commande != None:
         print(id_commande)
-        sql = ''' SELECT libelle_ski AS nom ,ligne_commande.quantite,prix_ski AS prix ,SUM(prix_ski*ligne_commande.quantite) AS prix_ligne
+        sql = ''' SELECT libelle_ski AS nom ,quantite,prix_ski AS prix ,SUM(prix_ski*ligne_commande.quantite) AS prix_ligne
                   FROM ligne_commande
                   INNER JOIN ski s on ligne_commande.id_ski = s.id_ski
                   WHERE id_commande=%s
