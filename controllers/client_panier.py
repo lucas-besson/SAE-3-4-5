@@ -16,8 +16,21 @@ def client_panier_add():
     id_article = request.form.get('id_article')
     quantite = request.form.get('quantite')
 
+    sql = " Select * from ligne_panier where id_ski=%s and id_utilisateur=%s"
+    mycursor.execute(sql,(id_article, id_client))
+    article_panier = mycursor.fetchone()
 
+    mycursor.execute(" Select * from ski where id_ski=%s", ( id_article ))
+    article = mycursor.fetchone()
 
+    if not (article_panier is None) and int(article_panier['quantite']) >= 1:
+        tuple_update = (quantite, id_client, id_article)
+        sql="Update ligne_panier set quantite = quantite+%s where id_utilisateur=%s and id_ski=%s"
+        mycursor.execute(sql, tuple_update)
+    else:
+        tuple_insert = (id_client, id_article, quantite)
+        sql="INSERT INTO ligne_panier (id_utilisateur, id_ski, quantite, date_ajout) values (%s,%s,%s, current_timestamp)"
+        mycursor.execute(sql, tuple_insert)
 
 
 
@@ -26,25 +39,27 @@ def client_panier_add():
     id_declinaison_article = 1
 
 # ajout dans le panier d'une déclinaison d'un article (si 1 declinaison : immédiat sinon => vu pour faire un choix
-    # sql = '''    '''
-    # mycursor.execute(sql, (id_article))
-    # declinaisons = mycursor.fetchall()
-    # if len(declinaisons) == 1:
-    #     id_declinaison_article = declinaisons[0]['id_declinaison_article']
-    # elif len(declinaisons) == 0:
-    #     abort("pb nb de declinaison")
-    # else:
-    #     sql = '''   '''
-    #     mycursor.execute(sql, (id_article))
-    #     article = mycursor.fetchone()
-    #     return render_template('client/boutique/declinaison_article.html'
-    #                                , declinaisons=declinaisons
-    #                                , quantite=quantite
-    #                                , article=article)
+    #sql = '''   '''
+    #mycursor.execute(sql, (id_article))
+    #declinaisons = mycursor.fetchall()
+     #if len(declinaisons) == 1:
+     #   id_declinaison_article = declinaisons[0]['id_declinaison_article']
+     #elif len(declinaisons) == 0:
+     #    abort("pb nb de declinaison")
+     #else:
+     #    sql = '''   ''',
+     #   mycursor.execute(sql, (id_article)),
+     #   article = mycursor.fetchone()
+     #   return render_template('client/boutique/declinaison_article.html'
+     #                              , declinaisons=declinaisons
+     #                               , quantite=quantite
+     #                              , article=article),
 
 # ajout dans le panier d'un article
 
-
+    sql='SELECT libelle_ski AS nom, COUNT(distinct id_ski) as quantite, prix_ski as prix, sum(count(disctinct id_ski) * prix_ski) from ski where id_ski=%s'
+    mycursor.execute(sql, id_client)
+    get_db().commit()
     return redirect('/client/article/show')
 
 @client_panier.route('/client/panier/delete', methods=['POST'])
