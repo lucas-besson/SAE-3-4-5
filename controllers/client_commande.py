@@ -63,12 +63,13 @@ def client_commande_add():
 def client_commande_show():
     mycursor = get_db().cursor()
     id_client = session['id_user']
-    sql = '''  SELECT commande.id_commande,date_achat , quantite AS nbr_articles, prix AS prix_total, e.id_etat AS etat_id,libelle
+    sql = '''  SELECT commande.id_commande,date_achat , SUM(quantite) AS nbr_articles, SUM(quantite*prix) AS prix_total,
+     e.id_etat AS etat_id,libelle
                FROM commande
-               RIGHT JOIN ligne_commande lc on commande.id_commande = lc.id_commande 
+               INNER JOIN ligne_commande lc on commande.id_commande = lc.id_commande 
                INNER JOIN etat e on commande.id_etat = e.id_etat
                WHERE id_utilisateur=%s
-               GROUP BY commande.id_commande, date_achat, quantite, prix, e.id_etat; '''
+               GROUP BY commande.id_commande, date_achat,  e.id_etat; '''
     mycursor.execute(sql, (id_client,))
     commandes = mycursor.fetchall()
 
@@ -77,7 +78,7 @@ def client_commande_show():
     id_commande = request.args.get('id_commande', None)
     if id_commande != None:
         print(id_commande)
-        sql = ''' SELECT libelle_ski AS nom ,quantite,prix_ski AS prix ,SUM(prix_ski*ligne_commande.quantite) AS prix_ligne
+        sql = ''' SELECT libelle_ski AS nom ,quantite,prix AS prix ,SUM(prix*ligne_commande.quantite) AS prix_ligne
                   FROM ligne_commande
                   INNER JOIN ski s on ligne_commande.id_ski = s.id_ski
                   WHERE id_commande=%s
