@@ -91,7 +91,8 @@ def client_commande_show():
                INNER JOIN ligne_commande lc on commande.id_commande = lc.id_commande 
                INNER JOIN etat e on commande.id_etat = e.id_etat
                WHERE id_utilisateur=%s
-               GROUP BY commande.id_commande, date_achat,  e.id_etat; '''
+               GROUP BY commande.id_commande, date_achat,  e.id_etat
+               ORDER BY etat_id,date_achat; '''
     mycursor.execute(sql, (id_client,))
     commandes = mycursor.fetchall()
 

@@ -171,4 +171,4 @@ SELECT *
 FROM ligne_panier
 WHERE id_utilisateur=2 AND id_ski=1;
 
-DELETE FROM ligne_panier WHERE id_utilisateur=2 AND id_ski=1
+DELETE FROM ligne_panier WHERE id_utilisateur=2 AND id_ski=1;
