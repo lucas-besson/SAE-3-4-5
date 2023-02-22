@@ -12,6 +12,7 @@ client_panier = Blueprint('client_panier', __name__,
 @client_panier.route('/client/panier/add', methods=['POST'])
 def client_panier_add():
     mycursor = get_db().cursor()
+    # ajout dans le panier d'un article
     id_client = session['id_user']
     id_article = request.form.get('id_article')
     quantite = request.form.get('quantite')
@@ -54,8 +55,6 @@ def client_panier_add():
      #                              , declinaisons=declinaisons
      #                               , quantite=quantite
      #                              , article=article),
-
-# ajout dans le panier d'un article
 
     return redirect('/client/article/show')
 
