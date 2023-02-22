@@ -31,7 +31,7 @@ def client_panier_add():
         tuple_insert = (id_client, id_article, quantite)
         sql="INSERT INTO ligne_panier (id_utilisateur, id_ski, quantite, date_ajout) values (%s,%s,%s, current_timestamp)"
         mycursor.execute(sql, tuple_insert)
-
+    get_db().commit()
 
 
     # ---------
@@ -57,9 +57,6 @@ def client_panier_add():
 
 # ajout dans le panier d'un article
 
-    sql='SELECT libelle_ski AS nom, COUNT(distinct id_ski) as quantite, prix_ski as prix, sum(count(disctinct id_ski) * prix_ski) from ski where id_ski=%s'
-    mycursor.execute(sql, id_client)
-    get_db().commit()
     return redirect('/client/article/show')
 
 @client_panier.route('/client/panier/delete', methods=['POST'])

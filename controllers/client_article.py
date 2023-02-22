@@ -44,7 +44,6 @@ def client_article_show():                                 # remplace client_ind
             list_param.append(item)
         sql = sql + ")"
     tuple_sql = tuple(list_param)
-    print("coucou" + sql)
     mycursor.execute(sql, tuple_sql)
     articles = mycursor.fetchall()
     sql = '''
@@ -58,17 +57,25 @@ def client_article_show():                                 # remplace client_ind
 
 
 
-
-    articles_panier = []
+    sql=''' SELECT libelle_ski AS nom, quantite, prix_ski AS prix
+            FROM ski
+            INNER JOIN ligne_panier lp on ski.id_ski = lp.id_ski
+            WHERE id_utilisateur=%s '''
+    mycursor.execute(sql,(id_client))
+    articles_panier = mycursor.fetchall()
 
     if len(articles_panier) >= 1:
-        sql = ''' calcul du prix total du panier '''
-        prix_total = None
+        sql = ''' SELECT SUM(prix_ski*quantite) as prix
+                  FROM ski
+                  INNER JOIN ligne_panier lp on ski.id_ski = lp.id_ski
+                  WHERE id_utilisateur=%s '''
+        mycursor.execute(sql, id_client)
+        prix_total = mycursor.fetchone()
     else:
         prix_total = None
     return render_template('client/boutique/panier_article.html'
                            , articles=articles
                            , articles_panier=articles_panier
-                           #, prix_total=prix_total
+                           , prix_total=prix_total
                            , items_filtre=types_article
                            )

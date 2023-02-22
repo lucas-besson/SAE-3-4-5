@@ -65,7 +65,7 @@ CREATE TABLE commande(
 CREATE TABLE ski(
    id_ski INT AUTO_INCREMENT,
    libelle_ski VARCHAR(255),
-   prix_ski INT,
+   prix_ski NUMERIC(6,2),
    stock INT,
    image VARCHAR(255),
    id_niveau INT NOT NULL,
@@ -80,7 +80,7 @@ CREATE TABLE ski(
 CREATE TABLE ligne_commande(
    id_commande INT,
    id_ski INT,
-   prix INT,
+   prix DECIMAL(10,2),
    quantite INT,
    PRIMARY KEY(id_commande, id_ski),
    FOREIGN KEY(id_commande) REFERENCES commande(id_commande),
@@ -91,9 +91,9 @@ CREATE TABLE ligne_panier(
    id_utilisateur INT,
    id_ski INT,
    JJ_MM_AAAA DATE,
-   quantite VARCHAR(255),
+   quantite INT,
    date_ajout DATE,
-   PRIMARY KEY(id_utilisateur, id_ski, JJ_MM_AAAA),
+   PRIMARY KEY(id_utilisateur, id_ski),
    FOREIGN KEY(id_utilisateur) REFERENCES utilisateur(id_utilisateur),
    FOREIGN KEY(id_ski) REFERENCES ski(id_ski)
 );
@@ -137,21 +137,21 @@ INSERT INTO niveau_ski (libelle_niveau) VALUES
 SELECT *FROM niveau_ski;
 
 INSERT INTO ski (libelle_ski, prix_ski, stock, image, id_niveau, id_taille_ski, id_type_ski) VALUES
-        ('BLACKOPS W92 OPEN ', 375, 4, 'BLACKOPS.png', 2, 4, 3),
-        ('ESCAPER 87 OPEN', 520, 5, 'ESCAPER.png', 2, 9, 2),
-        ('EXPERIENCE 78 CARBON (XPRESS)', 430, 2, 'EXPERIENCE_78.png', 2, 5, 2),
-        ('EXPERIENCE 86 BASALT (KONECT)', 740, 2, 'EXPERIENCE_86.png', 2, 8, 2),
-        ('ENFANT EXPERIENCE Pro (Team 4GW)', 130, 9, 'EXPERIENCE_PRO.png', 2, 1, 2),
-        ('FREESTYLE TRIXIE', 299, 4, 'TRIXIE.png', 2, 5, 4),
-        ('NOVA 10 TI (XPRESS) ', 675, 3, 'NOVA_10_TI.png', 2, 9, 1),
-        ('QST 98 ', 600, 1, 'QST_98.png', 2, 12, 3),
-        ('QST BLANK TEAM', 350, 6, 'QST_BLANK_TEAM.png', 2, 14, 3),
-        ('S FORCE Ti.80 PRO', 850, 2, 'FORCE_Ti_80_PRO.png', 2, 18, 1),
-        ('S MAX N°6 XT (and M10)', 450, 5, 'MAX_XT.png', 1, 7, 1),
-        ('SENDER 104 T1 OPEN', 740, 2, 'SENDER_104_TI_OPEN.png', 3, 12, 3),
-        ('Signature PALMARES (KONECT) ', 780, 3, 'SIGNATURE_PALMARES.png', 2, 8, 1),
-        ('SIGNATURE ROC 550 (XPRESS) ', 540, 3, 'SIGNATURE_ROC_550.png', 2, 6, 1),
-        ('STRATO EDITION (Konect)', 1195, 5, 'SIGNATURE_STRATO.png', 3, 11, 1);
+        ('BLACKOPS W92 OPEN ', 375.0, 4, 'BLACKOPS.png', 2, 4, 3),
+        ('ESCAPER 87 OPEN', 520.0, 5, 'ESCAPER.png', 2, 9, 2),
+        ('EXPERIENCE 78 CARBON (XPRESS)', 430.0, 2, 'EXPERIENCE_78.png', 2, 5, 2),
+        ('EXPERIENCE 86 BASALT (KONECT)', 740.0, 2, 'EXPERIENCE_86.png', 2, 8, 2),
+        ('ENFANT EXPERIENCE Pro (Team 4GW)', 130.0, 9, 'EXPERIENCE_PRO.png', 2, 1, 2),
+        ('FREESTYLE TRIXIE', 299.0, 4, 'TRIXIE.png', 2, 5, 4),
+        ('NOVA 10 TI (XPRESS) ', 675.0, 3, 'NOVA_10_TI.png', 2, 9, 1),
+        ('QST 98 ', 600.0, 1, 'QST_98.png', 2, 12, 3),
+        ('QST BLANK TEAM', 350.0, 6, 'QST_BLANK_TEAM.png', 2, 14, 3),
+        ('S FORCE Ti.80 PRO', 850.0, 2, 'FORCE_Ti_80_PRO.png', 2, 18, 1),
+        ('S MAX N°6 XT (and M10)', 450.0, 5, 'MAX_XT.png', 1, 7, 1),
+        ('SENDER 104 T1 OPEN', 740.0, 2, 'SENDER_104_TI_OPEN.png', 3, 12, 3),
+        ('Signature PALMARES (KONECT) ', 780.0, 3, 'SIGNATURE_PALMARES.png', 2, 8, 1),
+        ('SIGNATURE ROC 550 (XPRESS) ', 540.0, 3, 'SIGNATURE_ROC_550.png', 2, 6, 1),
+        ('STRATO EDITION (Konect)', 1195.0, 5, 'SIGNATURE_STRATO.png', 3, 11, 1);
 
 INSERT INTO etat (libelle) VALUES
         ('en cours de traitement'),
@@ -166,3 +166,9 @@ INSERT INTO ligne_commande (id_commande,id_ski,prix,quantite) VALUES
         (1,3,750,2),
         (2,2,1125,3);
 
+
+SELECT *
+FROM ligne_panier
+WHERE id_utilisateur=2 AND id_ski=1;
+
+DELETE FROM ligne_panier WHERE id_utilisateur=2 AND id_ski=1
