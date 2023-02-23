@@ -40,9 +40,11 @@ def valid_add_declinaison_article():
 def edit_declinaison_article():
     id_declinaison_article = request.args.get('id_declinaison_article')
     mycursor = get_db().cursor()
-    declinaison_article=[]
-    couleurs=None
-    tailles=None
+    sql ='select id_ski as article_id,libelle_ski as nom,stock,image as image_article from ski where id_ski=%s'
+    mycursor.execute(sql, (id_declinaison_article))
+    declinaison_article = mycursor.fetchone()
+    couleurs=''
+    tailles=''
     return render_template('admin/article/edit_declinaison_article.html'
                            , tailles=tailles
                            , couleurs=couleurs
@@ -58,6 +60,9 @@ def valid_edit_declinaison_article():
     taille_id = request.form.get('id_taille','')
     couleur_id = request.form.get('id_couleur','')
     mycursor = get_db().cursor()
+    sql = '''  UPDATE ski SET stock=%s where id_ski=%s '''
+    mycursor.execute(sql, (stock, id_article))
+    get_db().commit()
 
     message = u'declinaison_article modifié , id:' + str(id_declinaison_article) + '- stock :' + str(stock) + ' - taille_id:' + str(taille_id) + ' - couleur_id:' + str(couleur_id)
     flash(message, 'alert-success')

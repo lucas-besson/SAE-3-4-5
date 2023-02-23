@@ -68,6 +68,7 @@ CREATE TABLE ski(
    prix_ski NUMERIC(6,2),
    stock INT,
    image VARCHAR(255),
+   description varchar(255),
    id_niveau INT NOT NULL,
    id_taille_ski INT NOT NULL,
    id_type_ski INT NOT NULL,
@@ -136,22 +137,22 @@ INSERT INTO niveau_ski (libelle_niveau) VALUES
 
 SELECT *FROM niveau_ski;
 
-INSERT INTO ski (libelle_ski, prix_ski, stock, image, id_niveau, id_taille_ski, id_type_ski) VALUES
-        ('BLACKOPS W92 OPEN ', 375.0, 4, 'BLACKOPS.png', 2, 4, 3),
-        ('ESCAPER 87 OPEN', 520.0, 5, 'ESCAPER.png', 2, 9, 2),
-        ('EXPERIENCE 78 CARBON (XPRESS)', 430.0, 2, 'EXPERIENCE_78.png', 2, 5, 2),
-        ('EXPERIENCE 86 BASALT (KONECT)', 740.0, 2, 'EXPERIENCE_86.png', 2, 8, 2),
-        ('ENFANT EXPERIENCE Pro (Team 4GW)', 130.0, 9, 'EXPERIENCE_PRO.png', 2, 1, 2),
-        ('FREESTYLE TRIXIE', 299.0, 4, 'TRIXIE.png', 2, 5, 4),
-        ('NOVA 10 TI (XPRESS) ', 675.0, 3, 'NOVA_10_TI.png', 2, 9, 1),
-        ('QST 98 ', 600.0, 1, 'QST_98.png', 2, 12, 3),
-        ('QST BLANK TEAM', 350.0, 6, 'QST_BLANK_TEAM.png', 2, 14, 3),
-        ('S FORCE Ti.80 PRO', 850.0, 2, 'FORCE_Ti_80_PRO.png', 2, 18, 1),
-        ('S MAX N°6 XT (and M10)', 450.0, 5, 'MAX_XT.png', 1, 7, 1),
-        ('SENDER 104 T1 OPEN', 740.0, 2, 'SENDER_104_TI_OPEN.png', 3, 12, 3),
-        ('Signature PALMARES (KONECT) ', 780.0, 3, 'SIGNATURE_PALMARES.png', 2, 8, 1),
-        ('SIGNATURE ROC 550 (XPRESS) ', 540.0, 3, 'SIGNATURE_ROC_550.png', 2, 6, 1),
-        ('STRATO EDITION (Konect)', 1195.0, 5, 'SIGNATURE_STRATO.png', 3, 11, 1);
+INSERT INTO ski (libelle_ski, prix_ski, stock, image,description, id_niveau, id_taille_ski, id_type_ski) VALUES
+        ('BLACKOPS W92 OPEN ', 375.0, 4, 'BLACKOPS.png','très bon ski', 2, 4, 3),
+        ('ESCAPER 87 OPEN', 520.0, 5, 'ESCAPER.png','très bon ski', 2, 9, 2),
+        ('EXPERIENCE 78 CARBON (XPRESS)', 430.0, 2, 'EXPERIENCE_78.png','très bon ski', 2, 5, 2),
+        ('EXPERIENCE 86 BASALT (KONECT)', 740.0, 2, 'EXPERIENCE_86.png','très bon ski', 2, 8, 2),
+        ('ENFANT EXPERIENCE Pro (Team 4GW)', 130.0, 9, 'EXPERIENCE_PRO.png','très bon ski', 2, 1, 2),
+        ('FREESTYLE TRIXIE', 299.0, 4, 'TRIXIE.png','très bon ski',  2, 5, 4),
+        ('NOVA 10 TI (XPRESS) ', 675.0, 3, 'NOVA_10_TI.png','très bon ski',  2, 9, 1),
+        ('QST 98 ', 600.0, 1, 'QST_98.png', 'très bon ski', 2, 12, 3),
+        ('QST BLANK TEAM', 350.0, 6, 'QST_BLANK_TEAM.png','très bon ski',  2, 14, 3),
+        ('S FORCE Ti.80 PRO', 850.0, 2, 'FORCE_Ti_80_PRO.png', 'très bon ski', 2, 18, 1),
+        ('S MAX N°6 XT (and M10)', 450.0, 5, 'MAX_XT.png','très bon ski',  1, 7, 1),
+        ('SENDER 104 T1 OPEN', 740.0, 2, 'SENDER_104_TI_OPEN.png','très bon ski',  3, 12, 3),
+        ('Signature PALMARES (KONECT) ', 780.0, 3, 'SIGNATURE_PALMARES.png','très bon ski',  2, 8, 1),
+        ('SIGNATURE ROC 550 (XPRESS) ', 540.0, 3, 'SIGNATURE_ROC_550.png','très bon ski',  2, 6, 1),
+        ('STRATO EDITION (Konect)', 1195.0, 5, 'SIGNATURE_STRATO.png', 'très bon ski', 3, 11, 1);
 
 INSERT INTO etat (libelle) VALUES
         ('en cours de traitement'),
