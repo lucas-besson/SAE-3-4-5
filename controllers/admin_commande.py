@@ -27,9 +27,7 @@ def admin_commande_show():
     articles_commande = None
     commande_adresses = None
     id_commande = request.args.get('id_commande', None)
-    print(id_commande)
     if id_commande != None:
-        print(id_commande)
         sql = ''' SELECT libelle_ski AS nom ,quantite,prix_ski AS prix ,SUM(prix*ligne_commande.quantite) AS prix_ligne
                   FROM ligne_commande
                   INNER JOIN ski s on ligne_commande.id_ski = s.id_ski
@@ -37,7 +35,9 @@ def admin_commande_show():
                   GROUP BY libelle_ski, quantite, prix_ski; '''
         mycursor.execute(sql,(id_commande,))
         articles_commande = mycursor.fetchall()
-        commande_adresses = []
+        sql = 'select nom as nom_livraison from utilisateur INNER JOIN commande c on utilisateur.id_utilisateur = c.id_utilisateur where id_commande=%s'
+        mycursor.execute(sql,id_commande)
+        commande_adresses = mycursor.fetchone()
     return render_template('admin/commandes/show.html'
                            , commandes=commandes
                            , articles_commande=articles_commande
