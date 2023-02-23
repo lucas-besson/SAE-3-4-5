@@ -13,7 +13,7 @@ client_commande = Blueprint('client_commande', __name__,
 def client_commande_valide():
     mycursor = get_db().cursor()
     id_client = session['id_user']
-    sql = ''' SELECT libelle_ski AS nom, quantite, prix_ski AS prix
+    sql = ''' SELECT libelle_ski AS nom, quantite, prix_ski AS prix,ski.id_ski AS id_article,stock
             FROM ski
             INNER JOIN ligne_panier lp on ski.id_ski = lp.id_ski
             WHERE id_utilisateur=%s 

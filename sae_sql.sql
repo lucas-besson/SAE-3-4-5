@@ -68,7 +68,7 @@ CREATE TABLE ski(
    prix_ski NUMERIC(6,2),
    stock INT,
    image VARCHAR(255),
-   description varchar(255),
+   description VARCHAR(255),
    id_niveau INT NOT NULL,
    id_taille_ski INT NOT NULL,
    id_type_ski INT NOT NULL,
