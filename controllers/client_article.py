@@ -57,7 +57,7 @@ def client_article_show():                                 # remplace client_ind
 
 
 
-    sql=''' SELECT libelle_ski AS nom, quantite, prix_ski AS prix
+    sql=''' SELECT libelle_ski AS nom, quantite, prix_ski AS prix, ski.id_ski AS id_article
             FROM ski
             INNER JOIN ligne_panier lp on ski.id_ski = lp.id_ski
             WHERE id_utilisateur=%s '''
