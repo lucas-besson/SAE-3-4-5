@@ -167,8 +167,3 @@ INSERT INTO ligne_commande (id_commande,id_ski,prix,quantite) VALUES
         (1,3,750,2),
         (2,2,1125,3);
 
-SELECT *
-FROM ligne_panier
-WHERE id_utilisateur=2 AND id_ski=1;
-
-DELETE FROM ligne_panier WHERE id_utilisateur=2 AND id_ski=1;

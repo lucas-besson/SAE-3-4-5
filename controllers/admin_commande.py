@@ -21,7 +21,8 @@ def admin_commande_show():
     sql = 'SELECT commande.id_commande,date_achat , sum(quantite) AS nbr_articles, sum(prix*quantite) AS prix_total, e.id_etat AS etat_id,libelle from commande '\
           'INNER JOIN ligne_commande l on commande.id_commande = l.id_commande '\
           'INNER JOIN etat e on commande.id_etat = e.id_etat '\
-          'GROUP BY id_commande'
+          'GROUP BY id_commande,date_achat,e.id_etat,libelle ' \
+          'ORDER BY date_achat DESC,e.id_etat'
     mycursor.execute(sql)
     commandes = mycursor.fetchall()
     articles_commande = None
