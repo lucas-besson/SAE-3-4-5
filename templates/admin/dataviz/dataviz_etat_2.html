@@ -1,0 +1,131 @@
+{% extends 'admin/layout_admin.html' %}
+
+
+{% block javascripts %}
+{#    attention il faut importer la bibliotheque chart.js avant de définir l'objet chart#}
+    {{ super() }}
+   {# <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.js') }}" ></script>#}
+{% endblock %}
+
+{% block javascripts_head %}
+{#    attention il faut importer la bibliotheque chart.js avant de définir l'objet chart#}
+{#    <script src="{{ url_for('static', filename='chart.js') }}" ></script>#}
+      <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+{% endblock %}
+
+{% block title %}
+    <title>visualisation de données</title>
+{% endblock %}
+
+{% block body %}
+        <h1>Dataviz des skis - Statistique Générale : </h1>
+        <br>
+        <h4>Vous trouverez ci-dessous le nombre d'articles par catégorie (type de ski) : </h4>
+
+        <table class="table table-hover">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Type de ski</th><th>(id) </th><th> Nombre de skis</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% if bilan_type | length >= 1 %}
+                    {% for ligne in bilan_type %}
+                       <tr>
+                          <td>{{ ligne.libelle_type }}</td>
+                          <td>{{ ligne.id }}</td>
+                          <td><span style="color: red">{{ ligne.nb_articles}}</span></td>
+                       </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                      <td>
+                          Pas de tableaux
+                      </td>
+                   </tr>
+                {% endif %}
+                </tbody>
+            </table>
+
+
+        <br>
+        <br>
+        <h4>Vous trouverez ci-dessous, les 3 articles les plus vendus : </h4>
+        <canvas id="myChart" width="300" height="200"></canvas>
+        <script type="text/javascript">
+          const labels = {{ labels_commande|safe }};
+          const values = {{ values_commande|safe }};
+          const colors = ["#3e95cd", "#8e5ea2","#3cba9f"];
+          var ctx = document.getElementById('myChart').getContext('2d');
+          var myChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+              labels: labels,
+              datasets: [{
+                data: values,
+                backgroundColor: colors,
+                label: 'Nombre vendus'
+              }]
+            },
+            options: {
+              responsive: true
+            }
+          });
+        </script>
+
+            <br>
+            <br>
+
+        <h4>Vous trouverez ci-dessous, les 3 longueurs les plus vendus : </h4>
+    
+        <canvas id="longueur"></canvas>
+        <script type="text/javascript">
+                const labels2 = {{ labels_longueur|safe }};
+                const values2 = {{ values_longueur|safe }};
+                const colors2 =  ["#3cba90","#e8c3b9","#c45850"];
+                var ctx = document.getElementById('longueur').getContext('2d');
+                var myChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels2,
+                        datasets: [{
+                            data: values2,
+                            backgroundColor: colors2,
+                            label: 'Nombre vendus'
+                        }]
+                    },
+                    options: {
+                        responsive: true
+                    }
+                });
+            </script>
+
+    <br>
+    <br>
+
+    <h4>Vous trouverez ci-dessous, les client qui on le plus dépensé dans la boutique avec la somme totale : * </h4>
+    <p>*Nous afficherons au maximum les trois premiers clients pour que le graphique reste lisible</p>
+
+    <canvas id="client"></canvas>
+        <script type="text/javascript">
+                const labels3 = {{ labels_client|safe }};
+                const values3 = {{ values_client|safe }};
+                const colors3 =  ["#3cba90","#e8c3b9","#c45850"];
+                var ctx = document.getElementById('client').getContext('2d');
+                var myChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels3,
+                        datasets: [{
+                            data: values3,
+                            backgroundColor: colors3,
+                            label: 'Totale dépensé en euro'
+                        }]
+                    },
+                    options: {
+                        responsive: true
+                    }
+                });
+            </script>
+{% endblock %}
