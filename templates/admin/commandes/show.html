@@ -10,7 +10,11 @@
                 <tbody>
                         {% for ligne in articles_commande %}
                             <tr>
-                                <td>{{ ligne.nom }}</td>
+                                <td>{{ ligne.nom }}
+                                    {% if ligne.nb_declinaison > 1 %}
+                                        <span style="color: red">, déclinaison choisi par le client : {{ ligne.longueur }}cm</span>
+                                    {% endif %}
+                                </td>
                                 <td>{{ ligne.quantite }}</td>
                                 <td>{{ ligne.prix }} €</td>
                                 <td>{{ ligne.prix_ligne }} €  </td>

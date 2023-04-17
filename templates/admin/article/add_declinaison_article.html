@@ -16,14 +16,6 @@
                 <label for="stock">stock :
                     <input name="stock" id="stock" type="number" class="form-control" required>
                 </label>
-                <label for="couleur">Couleur :
-                    <select name="couleur" required class="form-select">
-                        <option value="">Sélectionner une couleur</option>
-                        {% for couleur in couleurs %}
-                             <option value="{{ couleur.id_couleur }}"> {{ couleur.libelle }}</option>
-                        {% endfor %}
-                    </select>
-                </label>
                 <label for="taille">Taille :
                     <select id="taille" name="taille" required class="form-select">
                         <option value="">Sélectionner une taille</option>

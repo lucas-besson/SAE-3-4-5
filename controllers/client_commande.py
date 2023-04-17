@@ -13,18 +13,25 @@ client_commande = Blueprint('client_commande', __name__,
 def client_commande_valide():
     mycursor = get_db().cursor()
     id_client = session['id_user']
-    sql = ''' SELECT libelle_ski AS nom, quantite, prix_ski AS prix,ski.id_ski AS id_article,stock
-            FROM ski
-            INNER JOIN ligne_panier lp on ski.id_ski = lp.id_ski
-            WHERE id_utilisateur=%s 
-    '''
+    sql = ''' SELECT s.id_ski, s.libelle_ski AS nom, lp.quantite, ds.prix_declinaison AS prix, lp.id_declinaison_ski AS id_declinaison_article, ds.stock, l.id_longueur_ski as id_taille, longueur_ski as libelle_couleur, nb_longueurs.nb_longueurs_diff AS nb_declinaison
+                FROM ligne_panier lp
+                INNER JOIN declinaison_ski ds ON lp.id_declinaison_ski = ds.id_declinaison_ski
+                INNER JOIN longueur l on ds.id_longueur_ski = l.id_longueur_ski
+                INNER JOIN ski s ON ds.id_ski = s.id_ski
+                INNER JOIN (
+                    SELECT ds.id_ski, COUNT(DISTINCT ds.id_longueur_ski) AS nb_longueurs_diff
+                    FROM declinaison_ski ds
+                    GROUP BY ds.id_ski
+                ) AS nb_longueurs ON s.id_ski = nb_longueurs.id_ski
+                WHERE lp.id_utilisateur = %s
+                GROUP BY s.id_ski, s.libelle_ski, lp.quantite, ds.prix_declinaison, lp.id_declinaison_ski, ds.stock, longueur_ski;'''
     mycursor.execute(sql, (id_client))
     articles_panier = mycursor.fetchall()
 
     if len(articles_panier) >= 1:
-        sql = ''' SELECT SUM(prix_ski*quantite) as prix
-                  FROM ski
-                  INNER JOIN ligne_panier lp on ski.id_ski = lp.id_ski
+        sql = ''' SELECT SUM(prix_declinaison*quantite) as prix
+                  FROM declinaison_ski
+                  INNER JOIN ligne_panier lp on declinaison_ski.id_declinaison_ski = lp.id_declinaison_ski
                   WHERE id_utilisateur=%s '''
         mycursor.execute(sql, id_client)
         prix_total = mycursor.fetchone()
@@ -32,7 +39,7 @@ def client_commande_valide():
         prix_total = None
     # etape 2 : selection des adresses
     return render_template('client/boutique/panier_validation_adresses.html'
-                           #, adresses=adresses
+                           # adresses=adresses
                            , articles_panier=articles_panier
                            , prix_total= prix_total
                            , validation=1
@@ -64,14 +71,14 @@ def client_commande_add():
     # numéro de la dernière commande
 
     for item in items_ligne_panier:
-        sql = ''' DELETE FROM ligne_panier WHERE id_utilisateur=%s AND id_ski=%s '''
-        mycursor.execute(sql,(item['id_utilisateur'], item['id_ski']))
-        sql = '''  SELECT prix_ski AS prix FROM ski WHERE id_ski=%s'''
-        mycursor.execute(sql, item['id_ski'])
+        sql = ''' DELETE FROM ligne_panier WHERE id_utilisateur=%s AND id_declinaison_ski=%s '''
+        mycursor.execute(sql,(item['id_utilisateur'], item['id_declinaison_ski']))
+        sql = '''  SELECT prix_declinaison AS prix FROM declinaison_ski WHERE id_declinaison_ski=%s'''
+        mycursor.execute(sql, item['id_declinaison_ski'])
         prix = mycursor.fetchone()
         print(prix)
-        sql = ''' INSERT INTO ligne_commande(id_commande,id_ski,prix,quantite) VALUES (%s,%s,%s,%s)'''
-        tuple_insert = (commande_id['last_insert_id'], item['id_ski'], prix['prix'], item['quantite'])
+        sql = ''' INSERT INTO ligne_commande(id_commande,id_declinaison_ski,prix,quantite) VALUES (%s,%s,%s,%s)'''
+        tuple_insert = (commande_id['last_insert_id'], item['id_declinaison_ski'], prix['prix'], item['quantite'])
         print(tuple_insert)
         mycursor.execute(sql, tuple_insert)
     get_db().commit()
@@ -101,13 +108,21 @@ def client_commande_show():
     id_commande = request.args.get('id_commande', None)
     if id_commande != None:
         print(id_commande)
-        sql = ''' SELECT libelle_ski AS nom ,quantite,prix AS prix ,SUM(prix*ligne_commande.quantite) AS prix_ligne
+        sql = ''' SELECT libelle_ski AS nom ,quantite,prix AS prix ,SUM(prix*ligne_commande.quantite) AS prix_ligne, l.longueur_ski as longueur, nb_longueurs.nb_longueurs_diff AS nb_declinaison
                   FROM ligne_commande
-                  INNER JOIN ski s on ligne_commande.id_ski = s.id_ski
-                  WHERE id_commande=%s
-                  GROUP BY s.id_ski; '''
+                  INNER JOIN declinaison_ski ds on ligne_commande.id_declinaison_ski = ds.id_declinaison_ski
+                  INNER JOIN longueur l on ds.id_longueur_ski = l.id_longueur_ski
+                  INNER JOIN ski s on ds.id_ski = s.id_ski
+                  INNER JOIN (
+                    SELECT ds.id_ski, COUNT(DISTINCT ds.id_longueur_ski) AS nb_longueurs_diff
+                    FROM declinaison_ski ds
+                    GROUP BY ds.id_ski
+                    ) AS nb_longueurs ON s.id_ski = nb_longueurs.id_ski
+                  WHERE id_commande= %s
+                  GROUP BY libelle_ski, quantite, prix, ds.id_declinaison_ski; '''
         mycursor.execute(sql,(id_commande,))
         articles_commande = mycursor.fetchall()
+
 
         # partie 2 : selection de l'adresse de livraison et de facturation de la commande selectionnée
         sql = ''' selection des adressses '''

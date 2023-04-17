@@ -2,6 +2,7 @@
 # -*- coding:utf-8 -*-
 from flask import Blueprint
 from flask import Flask, request, render_template, redirect, flash, session
+from pymysql import IntegrityError
 
 from connexion_db import get_db
 
@@ -11,7 +12,10 @@ admin_type_article = Blueprint('admin_type_article', __name__,
 @admin_type_article.route('/admin/type-article/show')
 def show_type_article():
     mycursor = get_db().cursor()
-    sql = '''         '''
+    sql = '''  SELECT COALESCE(s.id_type_ski, t.id_type_ski) AS id_type_article, t.libelle_type_ski AS libelle, COUNT(s.id_ski) AS nbr_articles
+               FROM type_ski t
+               LEFT JOIN ski s ON t.id_type_ski = s.id_type_ski
+               GROUP BY id_type_article, libelle_type_ski'''
     mycursor.execute(sql)
     types_article = mycursor.fetchall()
     return render_template('admin/type_article/show_type_article.html', types_article=types_article)
@@ -25,7 +29,7 @@ def valid_add_type_article():
     libelle = request.form.get('libelle', '')
     tuple_insert = (libelle,)
     mycursor = get_db().cursor()
-    sql = '''         '''
+    sql = '''    INSERT INTO type_ski (libelle_type_ski) VALUES (%s)   '''
     mycursor.execute(sql, tuple_insert)
     get_db().commit()
     message = u'type ajouté , libellé :'+libelle
@@ -36,15 +40,24 @@ def valid_add_type_article():
 def delete_type_article():
     id_type_article = request.args.get('id_type_article', '')
     mycursor = get_db().cursor()
+    try:
+        sql = '''DELETE FROM type_ski WHERE id_type_ski=%s '''
+        mycursor.execute(sql,id_type_article)
+        get_db().commit()
+        flash(u'suppression type article , id : ' + id_type_article, 'alert-success')
+        return redirect('/admin/type-article/show')
+    except IntegrityError:
+        flash(u"Impossible de supprimer le type de ski car il est liée à des skis ", 'alert-warning')
+        return redirect('/admin/type-article/show')
 
-    flash(u'suppression type article , id : ' + id_type_article, 'alert-success')
-    return redirect('/admin/type-article/show')
 
 @admin_type_article.route('/admin/type-article/edit', methods=['GET'])
 def edit_type_article():
     id_type_article = request.args.get('id_type_article', '')
     mycursor = get_db().cursor()
-    sql = '''   '''
+    sql = '''  SELECT id_type_ski AS id_type_article, libelle_type_ski AS libelle
+               FROM type_ski
+               WHERE id_type_ski=%s'''
     mycursor.execute(sql, (id_type_article,))
     type_article = mycursor.fetchone()
     return render_template('admin/type_article/edit_type_article.html', type_article=type_article)
@@ -55,7 +68,7 @@ def valid_edit_type_article():
     id_type_article = request.form.get('id_type_article', '')
     tuple_update = (libelle, id_type_article)
     mycursor = get_db().cursor()
-    sql = '''   '''
+    sql = ''' UPDATE type_ski SET libelle_type_ski=%s WHERE id_type_ski=%s'''
     mycursor.execute(sql, tuple_update)
     get_db().commit()
     flash(u'type article modifié, id: ' + id_type_article + " libelle : " + libelle, 'alert-success')

@@ -35,6 +35,7 @@
                             <form  action="/client/panier/add"  method="post" class="col-2">
                                  <input type="radio" name="id_declinaison_article" value="{{ item_declinaison.id_declinaison_article }}" required>
                                     <small class="text-muted">Stock restant : {{ item_declinaison.stock }}</small>
+                                    <small class="text-muted">{{ item_declinaison.nb_declinaison }}</small>
                                  <div class="input-group">
                                     <button class="btn  btn-success"  id="button-addon1">
                                             <i class="bi bi-cart"></i>
@@ -44,7 +45,7 @@
                                  </div>
                             </form>
                        {% else %}
-                                 <small class="text-muted">article  momentanément indisponible</small>
+                                 <small class="text-muted">article momentanément indisponible</small>
                         {% endif %}
                         </li>
                       {% endif %}

@@ -17,7 +17,13 @@ admin_article = Blueprint('admin_article', __name__,
 @admin_article.route('/admin/article/show')
 def show_article():
     mycursor = get_db().cursor()
-    sql = '''  SELECT id_ski as id_article,prix_ski as prix,libelle_ski as nom,type_ski.id_type_ski as type_article_id,stock,image,type_ski.libelle_type_ski as libelle from type_ski inner join ski s on type_ski.id_type_ski=s.id_type_ski 
+    sql = '''  SELECT DISTINCT s.id_ski AS id_article, s.prix_ski AS prix, s.libelle_ski AS nom,
+       s.id_type_ski AS type_article_id, COALESCE(SUM(ds.stock), 0) AS stock, s.image AS image, t.libelle_type_ski AS libelle,COUNT(ds.id_declinaison_ski) AS nb_declinaisons
+               FROM ski s
+               INNER JOIN type_ski t ON s.id_type_ski = t.id_type_ski
+               LEFT JOIN declinaison_ski ds ON s.id_ski = ds.id_ski
+               LEFT JOIN longueur l ON ds.id_longueur_ski = l.id_longueur_ski
+               GROUP BY s.id_ski;
     '''
     mycursor.execute(sql)
     articles = mycursor.fetchall()
@@ -27,9 +33,11 @@ def show_article():
 @admin_article.route('/admin/article/add', methods=['GET'])
 def add_article():
     mycursor = get_db().cursor()
-
+    sql_select_types_article = "SELECT id_type_ski AS id_type_article, libelle_type_ski AS libelle  FROM type_ski"
+    mycursor.execute(sql_select_types_article)
+    type_article = mycursor.fetchall()
     return render_template('admin/article/add_article.html'
-                           #,types_article=type_article,
+                           ,types_article=type_article,
                            #,couleurs=colors
                            #,tailles=tailles
                             )
@@ -52,7 +60,7 @@ def valid_add_article():
         print("erreur")
         filename=None
 
-    sql = '''  requête admin_article_2 '''
+    sql = '''INSERT INTO ski (libelle_ski, image, prix_ski, id_type_ski, description) VALUES (%s, %s, %s, %s, %s)'''
 
     tuple_add = (nom, filename, prix, type_article_id, description)
     print(tuple_add)
@@ -71,20 +79,20 @@ def valid_add_article():
 def delete_article():
     id_article=request.args.get('id_article')
     mycursor = get_db().cursor()
-    sql = ''' '''
+    sql = '''SELECT COUNT(*) AS nb_declinaison FROM declinaison_ski WHERE id_ski = %s'''
     mycursor.execute(sql, id_article)
     nb_declinaison = mycursor.fetchone()
     if nb_declinaison['nb_declinaison'] > 0:
         message= u'il y a des declinaisons dans cet article : vous ne pouvez pas le supprimer'
         flash(message, 'alert-warning')
     else:
-        sql = ''' requête admin_article_4 '''
+        sql = ''' SELECT * FROM ski WHERE id_ski = %s'''
         mycursor.execute(sql, id_article)
         article = mycursor.fetchone()
         print(article)
         image = article['image']
 
-        sql = ''' requête admin_article_5  '''
+        sql = ''' DELETE FROM ski WHERE id_ski = %s  '''
         mycursor.execute(sql, id_article)
         get_db().commit()
         if image != None:
@@ -101,16 +109,23 @@ def delete_article():
 def edit_article():
     id_article=request.args.get('id_article')
     mycursor = get_db().cursor()
-    sql = '''  SELECT id_ski as id_article,prix_ski as prix,libelle_ski as nom,id_type_ski as type_article_id,stock,image,description FROM ski WHERE id_ski=%s '''
+    sql = '''  SELECT s.id_ski AS id_article, s.prix_ski AS prix, s.libelle_ski AS nom,
+               s.id_type_ski AS type_article_id, s.image AS image, t.libelle_type_ski AS libelle
+               FROM ski s
+               INNER JOIN type_ski t ON s.id_type_ski = t.id_type_ski
+               WHERE s.id_ski=%s;'''
     mycursor.execute(sql, (id_article))
     article = mycursor.fetchone()
     sql = '''
-    Select id_type_ski as id_type_article, libelle_type_ski as libelle from type_ski
+    SELECT id_type_ski AS id_type_article, libelle_type_ski AS libelle FROM type_ski
     '''
     mycursor.execute(sql)
     types_article = mycursor.fetchall()
 
-    sql = '''  select id_ski as id_declinaison_article,stock from ski where id_ski=%s '''
+    sql = '''  SELECT longueur_ski AS libelle_taille, stock, id_declinaison_ski AS id_declinaison_article, id_ski as article_id
+               FROM declinaison_ski
+               INNER JOIN longueur l on declinaison_ski.id_longueur_ski = l.id_longueur_ski
+                WHERE id_ski=%s'''
     mycursor.execute(sql, id_article)
     declinaisons_article = mycursor.fetchall()
 
@@ -132,7 +147,7 @@ def valid_edit_article():
     image = request.files.get('image')
     description = request.form.get('description')
     sql = '''
-        SELECT image from ski where id_ski=%s          '''
+        SELECT image FROM ski WHERE id_ski=%s          '''
     mycursor.execute(sql, id_article)
     image_nom = mycursor.fetchone()
     image_nom = image_nom['image']
@@ -148,6 +163,19 @@ def valid_edit_article():
 
     sql = '''  UPDATE ski SET libelle_ski=%s,image=%s,prix_ski=%s,id_type_ski=%s,description=%s where id_ski=%s '''
     mycursor.execute(sql, (nom, image_nom, prix, type_article_id, description, id_article))
+
+    sql_select_ski = "SELECT * FROM ski WHERE id_ski=%s"
+    mycursor.execute(sql_select_ski, (id_article,))
+    ski = mycursor.fetchone()
+
+    sql_select_declinaisons = "SELECT * FROM declinaison_ski WHERE id_ski=%s"
+    mycursor.execute(sql_select_declinaisons, (id_article,))
+    declinaisons = mycursor.fetchall()
+
+    for declinaison in declinaisons:
+        prix_declinaison = ski['prix_ski']
+        sql_update_declinaison = "UPDATE declinaison_ski SET prix_declinaison=%s WHERE id_declinaison_ski=%s"
+        mycursor.execute(sql_update_declinaison, (prix_declinaison, declinaison['id_declinaison_ski']))
 
     get_db().commit()
     if image_nom is None:
